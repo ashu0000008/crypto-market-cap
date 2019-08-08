@@ -19,11 +19,11 @@ func Fetch() {
 
 	q := url.Values{}
 	q.Add("start", "1")
-	q.Add("limit", "5000")
+	q.Add("limit", "1000")
 	q.Add("convert", "USD")
 
 	req.Header.Set("Accepts", "application/json")
-	req.Header.Add("X-CMC_PRO_API_KEY", "431f8c85-957c-4a08-9f0a-190a58a6a236")
+	req.Header.Add("X-CMC_PRO_API_KEY", "37b2d469-562a-4556-8886-b6e79658bc36")
 	req.URL.RawQuery = q.Encode()
 
 	resp, err := client.Do(req)
