@@ -1,0 +1,3 @@
+#!/bin/sh
+scp ./main/crypto-collector-linux  zhouyangzzu@35.233.166.159:/home/zhouyangzzu/
+echo "upload done"
