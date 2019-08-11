@@ -20,6 +20,7 @@ func taskCryptoCollector() {
 
 	db, err := db.Setup()
 	if err != nil {
+		print(err)
 		return
 	}
 	defer db.Close()
@@ -48,11 +49,13 @@ func collectCoin(db *sql.DB, coin CoinInfo) {
 
 	stmt, err := db.Prepare("INSERT INTO coininfo(cname, symbol, slug, maxsupply, circulatingsupply, platform, cmcrank) values(?,?,?,?,?,?,?)")
 	if err != nil {
+		print(err)
 		return
 	}
 
 	_, err = stmt.Exec(coin.Name, coin.Symbol, coin.Slug, coin.MaxSupply, coin.CirculatingSupply, coin.Platform, coin.CmcRank)
 	if err != nil {
+		print(err)
 		return
 	}
 

@@ -11,9 +11,9 @@ func init() {
 
 func setDefault() {
 	viper.SetDefault("database.user", "root")
-	viper.SetDefault("database.passwd", "abc223")
+	viper.SetDefault("database.passwd", "abc123")
 	viper.SetDefault("database.name", "test")
-	viper.SetDefault("database.host", "35.233.166.159:3306")
+	viper.SetDefault("database.host", "localhost:3306")
 	viper.SetDefault("database.connection", "tcp")
 }
 
