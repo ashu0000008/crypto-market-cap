@@ -21,12 +21,14 @@ func Setup() (*sql.DB, error) {
 	db, err := sql.Open("mysql", connectionString)
 
 	if err != nil {
+		print(err)
 		return nil, err
 	}
 
 	// Ping the database once since Open() doesn't open a connection
 	err = db.Ping()
 	if err != nil {
+		print(err)
 		return nil, err
 	}
 
