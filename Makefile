@@ -7,11 +7,12 @@ GOTEST=$(GOCMD) test
 
 all: clean test build build-linux
 build: 
-				cd main && $(GOBUILD) -o crypto-collector -v main.go
+				cd main && $(GOBUILD) -o ../output/crypto-collector -v main.go
+				cd api && $(GOBUILD) -o ../output/crypto-api -v api.go
 test:
 				cd main && $(GOTEST) -v ./...
 clean:
-				rm -f ./main/crypto-collector*
+				rm -f ./output/*
 
 # Cross compilation
 build-linux:
