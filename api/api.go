@@ -11,7 +11,7 @@ func main() {
 	// 注册一个路由和处理函数
 	engine.Any("/", WebRoot)
 	// 绑定端口，然后启动应用
-	engine.Run(":9205")
+	engine.Run(":80")
 }
 
 /**
