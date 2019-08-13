@@ -7,6 +7,7 @@ func StartTask(startAt int, f func()) {
 	go func() {
 		for {
 			f()
+			print("task done...\r\n")
 
 			//寻找下一个20点
 			now := time.Now()
