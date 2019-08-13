@@ -53,7 +53,8 @@ func collectCoin(db *sql.DB, coin CoinInfo) {
 		return
 	}
 
-	_, err = stmt.Exec(coin.Name, coin.Symbol, coin.Slug, coin.MaxSupply, coin.CirculatingSupply, coin.Platform, coin.CmcRank)
+	var platform = coin.Platform.Name
+	_, err = stmt.Exec(coin.Name, coin.Symbol, coin.Slug, coin.MaxSupply, coin.CirculatingSupply, platform, coin.CmcRank)
 	if err != nil {
 		print(err)
 		return
@@ -62,17 +63,21 @@ func collectCoin(db *sql.DB, coin CoinInfo) {
 }
 
 type CoinInfo struct {
-	Id                interface{} `json:"id"`
-	Name              interface{} `json:"name"`
-	Symbol            interface{} `json:"symbol"`
-	Slug              interface{} `json:"slug"`
-	MaxSupply         interface{} `json:"max_supply"`
-	CirculatingSupply interface{} `json:"circulating_supply"`
-	Platform          interface{} `json:"platform"`
-	CmcRank           interface{} `json:"cmc_rank"`
-	Tags              interface{} `json:"tags"`
+	Id                interface{}  `json:"id"`
+	Name              interface{}  `json:"name"`
+	Symbol            interface{}  `json:"symbol"`
+	Slug              interface{}  `json:"slug"`
+	MaxSupply         interface{}  `json:"max_supply"`
+	CirculatingSupply interface{}  `json:"circulating_supply"`
+	Platform          PlatformInfo `json:"platform"`
+	CmcRank           interface{}  `json:"cmc_rank"`
+	Tags              interface{}  `json:"tags"`
 }
 
 type ResponseData struct {
 	Data []CoinInfo `json:"data"`
+}
+
+type PlatformInfo struct {
+	Name string `json:"name"`
 }

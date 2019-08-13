@@ -32,6 +32,6 @@ func Fetch() string {
 	}
 	fmt.Println(resp.Status)
 	respBody, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(respBody))
+	//fmt.Println(string(respBody))
 	return string(respBody)
 }
