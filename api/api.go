@@ -15,6 +15,7 @@ func main() {
 	engine.Any("/", webRoot)
 	engine.GET("/info/list", getCryptoList)
 	engine.GET("/percent/:symbol", getCryptoPercent)
+	engine.GET("/platforms/summary", getCryptoPlatformsSummary)
 	// 绑定端口，然后启动应用
 	engine.Run(":80")
 }
@@ -36,4 +37,8 @@ func getCryptoPercent(context *gin.Context) {
 	symbol := context.Param("symbol")
 	percent := impl.GetPercent(symbol)
 	context.String(http.StatusOK, strconv.FormatFloat(percent, 'f', -1, 64))
+}
+
+func getCryptoPlatformsSummary(context *gin.Context) {
+	context.String(http.StatusOK, impl.GetCryptoPlatformsSummaryImpl())
 }
