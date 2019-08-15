@@ -36,6 +36,7 @@ func GetCryptoListImpl() string {
 		return "marshal error"
 	}
 
+	fmt.Print("GetCryptoListImpl catch record ", len(coinList), "\r\n")
 	return string(data)
 }
 

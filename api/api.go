@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 
 	"github.com/ashu0000008/crypto-market-cap/api/impl"
 )
@@ -13,6 +14,7 @@ func main() {
 	// 注册一个路由和处理函数
 	engine.Any("/", webRoot)
 	engine.GET("/info/list", getCryptoList)
+	engine.GET("/percent/:symbol", getCryptoPercent)
 	// 绑定端口，然后启动应用
 	engine.Run(":80")
 }
@@ -28,4 +30,10 @@ func webRoot(context *gin.Context) {
 
 func getCryptoList(context *gin.Context) {
 	context.String(http.StatusOK, impl.GetCryptoListImpl())
+}
+
+func getCryptoPercent(context *gin.Context) {
+	symbol := context.Param("symbol")
+	percent := impl.GetPercent(symbol)
+	context.String(http.StatusOK, strconv.FormatFloat(percent, 'f', -1, 64))
 }
