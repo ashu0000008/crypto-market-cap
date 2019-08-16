@@ -13,10 +13,13 @@ import (
 func main() {
 
 	var host string
+	var path string
 	if "linux" == runtime.GOOS {
 		host = "https://ashu.xyz/"
+		path = "/mytls/"
 	} else {
 		host = "https://localhost/"
+		path = "/Users/zhouyang/mytls/"
 	}
 
 	// 初始化引擎
@@ -33,7 +36,7 @@ func main() {
 	engine_https.GET("/percent/:symbol", getCryptoPercent)
 	engine_https.GET("/platforms/summary", getCryptoPlatformsSummary)
 
-	go engine_https.RunTLS(":443", "/Users/zhouyang/mytls/cert.pem", "/Users/zhouyang/mytls/privkey.pem")
+	go engine_https.RunTLS(":443", path+"cert.pem", path+"privkey.pem")
 	engine.Run(":80")
 }
 
