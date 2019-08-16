@@ -20,7 +20,7 @@ func main() {
 
 	// 绑定端口，然后启动应用
 	engine.Use(TlsHandler())
-	engine.RunTLS(":80", "/mytls/cert.pem", "/mytls/privkey.pem")
+	engine.RunTLS(":443", "/mytls/cert.pem", "/mytls/privkey.pem")
 }
 
 func TlsHandler() gin.HandlerFunc {
