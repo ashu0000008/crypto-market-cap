@@ -15,16 +15,16 @@ func main() {
 	var host string
 	var path string
 	if "darwin" != runtime.GOOS {
-		host = "https://ashu.xyz/"
+		host = "https://ashu.xyz"
 		path = "/mytls/"
 	} else {
-		host = "https://localhost/"
+		host = "https://localhost"
 		path = "/Users/zhouyang/mytls/"
 	}
 
 	// 初始化引擎
 	engine := gin.Default()
-	engine.GET("/", func(c *gin.Context) {
+	engine.GET("/*path", func(c *gin.Context) {
 		c.Redirect(302, host+c.Param("path"))
 	})
 
