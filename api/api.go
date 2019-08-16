@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/unrolled/secure"
 	"net/http"
 	"strconv"
 
@@ -16,8 +17,27 @@ func main() {
 	engine.GET("/info/list", getCryptoList)
 	engine.GET("/percent/:symbol", getCryptoPercent)
 	engine.GET("/platforms/summary", getCryptoPlatformsSummary)
+
 	// 绑定端口，然后启动应用
-	engine.Run(":80")
+	engine.Use(TlsHandler())
+	engine.RunTLS(":80", "/mytls/cert.pem", "/mytls/privkey.pem")
+}
+
+func TlsHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		secureMiddleware := secure.New(secure.Options{
+			SSLRedirect: true,
+			SSLHost:     "localhost:443",
+		})
+		err := secureMiddleware.Process(c.Writer, c.Request)
+
+		// If there was an error, do not continue.
+		if err != nil {
+			return
+		}
+
+		c.Next()
+	}
 }
 
 /**
