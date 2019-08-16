@@ -4,30 +4,44 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/unrolled/secure"
 	"net/http"
+	"runtime"
 	"strconv"
 
 	"github.com/ashu0000008/crypto-market-cap/api/impl"
 )
 
 func main() {
+
+	var host string
+	if "linux" == runtime.GOOS {
+		host = "https://ashu.xyz/"
+	} else {
+		host = "https://localhost/"
+	}
+
 	// 初始化引擎
 	engine := gin.Default()
-	// 注册一个路由和处理函数
-	engine.Any("/", webRoot)
-	engine.GET("/info/list", getCryptoList)
-	engine.GET("/percent/:symbol", getCryptoPercent)
-	engine.GET("/platforms/summary", getCryptoPlatformsSummary)
+	engine.GET("/", func(c *gin.Context) {
+		c.Redirect(302, host+c.Param("path"))
+	})
 
 	// 绑定端口，然后启动应用
-	engine.Use(TlsHandler())
-	engine.RunTLS(":443", "/mytls/cert.pem", "/mytls/privkey.pem")
+	engine_https := gin.Default()
+	engine_https.Use(TlsHandler())
+	engine_https.Any("/", webRoot)
+	engine_https.GET("/info/list", getCryptoList)
+	engine_https.GET("/percent/:symbol", getCryptoPercent)
+	engine_https.GET("/platforms/summary", getCryptoPlatformsSummary)
+
+	go engine_https.RunTLS(":443", "/Users/zhouyang/mytls/cert.pem", "/Users/zhouyang/mytls/privkey.pem")
+	engine.Run(":80")
 }
 
 func TlsHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		secureMiddleware := secure.New(secure.Options{
 			SSLRedirect: true,
-			SSLHost:     "localhost:443",
+			SSLHost:     "localhost:80",
 		})
 		err := secureMiddleware.Process(c.Writer, c.Request)
 
