@@ -14,7 +14,7 @@ func main() {
 
 	var host string
 	var path string
-	if "linux" == runtime.GOOS {
+	if "darwin" != runtime.GOOS {
 		host = "https://ashu.xyz/"
 		path = "/mytls/"
 	} else {
