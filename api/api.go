@@ -36,7 +36,7 @@ func main() {
 	engine_https.GET("/percent/:symbol", getCryptoPercent)
 	engine_https.GET("/platforms/summary", getCryptoPlatformsSummary)
 
-	go engine_https.RunTLS(":443", path+"chain.pem", path+"privkey.pem")
+	go engine_https.RunTLS(":443", path+"cert.pem", path+"privkey.pem")
 	engine.Run(":80")
 }
 
