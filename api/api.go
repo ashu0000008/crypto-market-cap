@@ -34,6 +34,7 @@ func main() {
 	engine_https.Any("/", webRoot)
 	engine_https.GET("/info/list", getCryptoList)
 	engine_https.GET("/percent/:symbol", getCryptoPercent)
+	engine_https.GET("/percent/:symbol/history", getCryptoPercentHistory)
 	engine_https.GET("/platforms/summary", getCryptoPlatformsSummary)
 	engine_https.GET("/platform/:platform", getCryptoPlatformInfo)
 
@@ -75,6 +76,11 @@ func getCryptoPercent(context *gin.Context) {
 	symbol := context.Param("symbol")
 	percent := impl.GetPercent(symbol)
 	context.String(http.StatusOK, strconv.FormatFloat(percent, 'f', -1, 64))
+}
+
+func getCryptoPercentHistory(context *gin.Context) {
+	symbol := context.Param("symbol")
+	context.String(http.StatusOK, impl.GetPercentHistory(symbol))
 }
 
 func getCryptoPlatformsSummary(context *gin.Context) {
