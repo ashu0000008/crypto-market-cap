@@ -35,6 +35,7 @@ func main() {
 	engine_https.GET("/info/list", getCryptoList)
 	engine_https.GET("/percent/:symbol", getCryptoPercent)
 	engine_https.GET("/platforms/summary", getCryptoPlatformsSummary)
+	engine_https.GET("/platform/:platform", getCryptoPlatformInfo)
 
 	go engine_https.RunTLS(":443", path+"cert.pem", path+"privkey.pem")
 	engine.Run(":80")
@@ -78,4 +79,9 @@ func getCryptoPercent(context *gin.Context) {
 
 func getCryptoPlatformsSummary(context *gin.Context) {
 	context.String(http.StatusOK, impl.GetCryptoPlatformsSummaryImpl())
+}
+
+func getCryptoPlatformInfo(context *gin.Context) {
+	platform := context.Param("platform")
+	context.String(http.StatusOK, impl.GetPlatformInfo(platform))
 }
