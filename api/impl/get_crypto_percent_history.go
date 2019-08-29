@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/ashu0000008/crypto-market-cap/db"
 	"sort"
-	"strconv"
 	"strings"
 )
 
@@ -20,7 +19,6 @@ func GetPercentHistory(symbol string) string {
 	var set map[string]bool
 	set = make(map[string]bool)
 	for loop := 0; ; loop++ {
-		print("------loop:" + strconv.Itoa(loop))
 		stmt, err := db.Prepare("select date1 from coincap LIMIT ?, ?")
 		rows, err := stmt.Query(2000*loop, 2000)
 		if err != nil {
