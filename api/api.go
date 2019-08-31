@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/ashu0000008/crypto-market-cap/account"
 	"github.com/gin-gonic/gin"
 	"github.com/unrolled/secure"
 	"net/http"
@@ -31,6 +32,7 @@ func main() {
 	// 绑定端口，然后启动应用
 	engine_https := gin.Default()
 	engine_https.Use(TlsHandler())
+	engine_https.Use(HeaderHandler())
 	engine_https.Any("/", webRoot)
 	engine_https.GET("/info/list", getCryptoList)
 	engine_https.GET("/percent/:symbol", getCryptoPercent)
@@ -54,6 +56,18 @@ func TlsHandler() gin.HandlerFunc {
 		if err != nil {
 			return
 		}
+
+		c.Next()
+	}
+}
+
+func HeaderHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		deviceId := c.Request.Header.Get("deviceId")
+
+		print("--" + c.Request.Method + c.Request.RequestURI + "-------")
+		print("deviceId---------------:" + deviceId + "\r\n")
+		account.Check2AddUser(deviceId)
 
 		c.Next()
 	}
