@@ -153,7 +153,7 @@ func getFavorite(context *gin.Context) {
 
 func postFavorite(context *gin.Context) {
 	device := context.GetHeader("deviceId")
-	symbol := context.Param("symbol")
+	symbol := context.Request.PostFormValue("symbol")
 	success := account.ApiAddFavorite(device, symbol)
 	if success {
 		context.String(http.StatusOK, "")

@@ -1,6 +1,7 @@
 package orm
 
 type Favorite struct {
-	Device_id string
-	Symbol    string
+	Id        int64  `gorm:"AUTO_INCREMENT"`
+	Device_id string `json:"device_id"`
+	Symbol    string `json:"symbol"`
 }

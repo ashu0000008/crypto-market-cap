@@ -1,7 +1,6 @@
 package account
 
 import (
-	"container/list"
 	"github.com/ashu0000008/crypto-market-cap/account/orm"
 )
 
@@ -60,14 +59,15 @@ func RemoveFavorite(deviceId string, symbol string) {
 	db.Table("favorite").Delete(&item)
 }
 
-func GetFavorite(deviceId string) *list.List {
+func GetFavorite(deviceId string) []orm.Favorite {
 	db, err := orm.Connect2db()
 	if err != nil {
 		panic("连接数据库失败")
 	}
 	defer db.Close()
 
-	users := list.New()
-	db.Table("favorite").Where("device_id = ?", deviceId).Find(&users)
-	return users
+	var items []orm.Favorite
+	db.Table("favorite").Where("device_id = ?", deviceId).Find(&items)
+
+	return items
 }
