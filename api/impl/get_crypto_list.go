@@ -6,7 +6,7 @@ import (
 	"github.com/ashu0000008/crypto-market-cap/db"
 )
 
-func GetCryptoListImpl() string {
+func GetCryptoListImpl(page int, size int) string {
 	db, err := db.Setup()
 	if err != nil {
 		print(err)

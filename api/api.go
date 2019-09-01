@@ -35,10 +35,15 @@ func main() {
 	engine_https.Use(HeaderHandler())
 	engine_https.Any("/", webRoot)
 	engine_https.GET("/info/list", getCryptoList)
+	engine_https.GET("/crypto/rank", getCryptoRank)
 	engine_https.GET("/percent/:symbol", getCryptoPercent)
 	engine_https.GET("/percent/:symbol/history", getCryptoPercentHistory)
 	engine_https.GET("/platforms/summary", getCryptoPlatformsSummary)
 	engine_https.GET("/platform/:platform", getCryptoPlatformInfo)
+
+	engine_https.GET("/favorite", getFavorite)
+	engine_https.POST("/favorite", postFavorite)
+	engine_https.DELETE("/favorite", deleteFavorite)
 
 	go engine_https.RunTLS(":443", path+"cert.pem", path+"privkey.pem")
 	engine.Run(":80")
@@ -83,7 +88,42 @@ func webRoot(context *gin.Context) {
 }
 
 func getCryptoList(context *gin.Context) {
-	context.String(http.StatusOK, impl.GetCryptoListImpl())
+	page := context.GetInt("page")
+	size := context.GetInt("size")
+	context.String(http.StatusOK, impl.GetCryptoListImpl(page, size))
+}
+
+func getCryptoRank(context *gin.Context) {
+	pageString := context.Query("page")
+	sizeString := context.Query("size")
+
+	var page int
+	var size int
+	var err error
+
+	if "" == pageString {
+		page = 0
+	} else {
+		page, err = strconv.Atoi(pageString)
+		if err != nil {
+			page = 0
+		}
+	}
+	if "" == sizeString {
+		size = 0
+	} else {
+		size, err = strconv.Atoi(sizeString)
+		if err != nil {
+			size = 0
+		}
+	}
+
+	if page == 0 && size == 0 {
+		page = 0
+		size = 1000
+	}
+
+	context.String(http.StatusOK, impl.GetCryptoRankImpl(page, size))
 }
 
 func getCryptoPercent(context *gin.Context) {
@@ -104,4 +144,31 @@ func getCryptoPlatformsSummary(context *gin.Context) {
 func getCryptoPlatformInfo(context *gin.Context) {
 	platform := context.Param("platform")
 	context.String(http.StatusOK, impl.GetPlatformInfo(platform))
+}
+
+func getFavorite(context *gin.Context) {
+	device := context.GetHeader("deviceId")
+	context.String(http.StatusOK, account.ApiGetFavorite(device))
+}
+
+func postFavorite(context *gin.Context) {
+	device := context.GetHeader("deviceId")
+	symbol := context.Param("symbol")
+	success := account.ApiAddFavorite(device, symbol)
+	if success {
+		context.String(http.StatusOK, "")
+	} else {
+		context.String(http.StatusInternalServerError, "")
+	}
+}
+
+func deleteFavorite(context *gin.Context) {
+	device := context.GetHeader("deviceId")
+	symbol := context.Param("symbol")
+	success := account.ApiDeleteFavorite(device, symbol)
+	if success {
+		context.String(http.StatusOK, "")
+	} else {
+		context.String(http.StatusInternalServerError, "")
+	}
 }
