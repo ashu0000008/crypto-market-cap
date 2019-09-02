@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/ashu0000008/crypto-market-cap/ws/data"
 	"net/http"
 	"time"
 
@@ -9,6 +10,9 @@ import (
 )
 
 func main() {
+	//开始收集binance数据
+	data.StartDataCollect()
+
 	http.ListenAndServe(":9000", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		conn, _, _, err := ws.UpgradeHTTP(r, w)
 		if err != nil {
