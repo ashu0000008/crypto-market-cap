@@ -17,13 +17,13 @@ func BinanceInit() {
 	logger = log.With(logger, "time", log.DefaultTimestampUTC, "caller", log.DefaultCaller)
 
 	hmacSigner := &binance.HmacSigner{
-		Key: []byte(os.Getenv("BINANCE_SECRET")),
+		Key: []byte("lsmH3Xq92RjdJvDTWpfmIUBBAV9xTou5u1LEqXvvtAK1EsLd3XoBIEqeXv1WB1Kv"),
 	}
 	ctx, _ := context.WithCancel(context.Background())
 	// use second return value for cancelling request
 	binanceService := binance.NewAPIService(
 		"https://www.binance.com",
-		os.Getenv("BINANCE_APIKEY"),
+		"cuI6fvo2HxKTtl4o5aH78bc3oojea2H7VEmmVnpkiMWSItb6E6oxTowMRvxqDo0q",
 		hmacSigner,
 		logger,
 		ctx,
@@ -37,7 +37,6 @@ func BinanceInit() {
 		Symbol: "ETHBTC",
 	})
 	if err != nil {
-		print(err)
 		panic(err)
 	}
 	go func() {
@@ -52,7 +51,7 @@ func BinanceInit() {
 	}()
 
 	fmt.Println("waiting for interrupt")
-	//<-interrupt
+	<-interrupt
 	//fmt.Println("canceling context")
 	//cancelCtx()
 	//fmt.Println("waiting for signal")
