@@ -55,8 +55,7 @@ func RemoveFavorite(deviceId string, symbol string) {
 		return
 	}
 
-	item = orm.Favorite{Device_id: deviceId, Symbol: symbol}
-	db.Table("favorite").Delete(&item)
+	db.Table("favorite").Where("device_id = ? && symbol = ?", deviceId, symbol).Delete(&item)
 }
 
 func GetFavorite(deviceId string) []orm.Favorite {

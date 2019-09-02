@@ -164,7 +164,7 @@ func postFavorite(context *gin.Context) {
 
 func deleteFavorite(context *gin.Context) {
 	device := context.GetHeader("deviceId")
-	symbol := context.Param("symbol")
+	symbol := context.Request.PostFormValue("symbol")
 	success := account.ApiDeleteFavorite(device, symbol)
 	if success {
 		context.String(http.StatusOK, "")
