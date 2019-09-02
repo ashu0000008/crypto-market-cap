@@ -19,7 +19,8 @@ func BinanceInit() {
 	hmacSigner := &binance.HmacSigner{
 		Key: []byte("lsmH3Xq92RjdJvDTWpfmIUBBAV9xTou5u1LEqXvvtAK1EsLd3XoBIEqeXv1WB1Kv"),
 	}
-	ctx, _ := context.WithCancel(context.Background())
+	ctx, cancelCtx := context.WithCancel(context.Background())
+
 	// use second return value for cancelling request
 	binanceService := binance.NewAPIService(
 		"https://www.binance.com",
@@ -51,12 +52,13 @@ func BinanceInit() {
 	}()
 
 	fmt.Println("waiting for interrupt")
+
 	<-interrupt
-	//fmt.Println("canceling context")
-	//cancelCtx()
-	//fmt.Println("waiting for signal")
-	//<-done
-	//fmt.Println("exit")
+	fmt.Println("canceling context")
+	cancelCtx()
+	fmt.Println("waiting for signal")
+	<-done
+	fmt.Println("exit")
 	return
 
 	//kl, err := b.Klines(binance.KlinesRequest{
