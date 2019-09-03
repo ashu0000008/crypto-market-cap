@@ -1,5 +1,5 @@
 package data
 
-func StartDataCollect() {
-	go HuobiInit()
+func StartDataCollect(chanCollector chan string, chanData chan string) {
+	go HuobiInit(chanCollector, chanData)
 }

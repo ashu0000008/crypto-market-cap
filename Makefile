@@ -9,7 +9,7 @@ all: clean test build build-linux
 build: 
 				cd main && $(GOBUILD) -o ../output/crypto-collector -v main.go
 				cd api && $(GOBUILD) -o ../output/crypto-api -v api.go
-				cd ws && $(GOBUILD) -o ../output/ws-echo -v server.go
+				cd ws && $(GOBUILD) -o ../output/ws-api -v main.go
 test:
 				cd main && $(GOTEST) -v ./...
 clean:
