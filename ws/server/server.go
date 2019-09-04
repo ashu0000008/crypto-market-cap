@@ -2,6 +2,7 @@ package server
 
 import (
 	"container/list"
+	"fmt"
 	"net"
 	"net/http"
 	"strings"
@@ -94,6 +95,8 @@ func initRelation() {
 }
 
 func AddRelation(conn1 net.Conn, symbol1 string) {
+	fmt.Println("AddRelation", conn1, symbol1)
+
 	_relations.lock.Lock()
 
 	data := relation{conn: conn1, symbol: symbol1}
@@ -103,6 +106,8 @@ func AddRelation(conn1 net.Conn, symbol1 string) {
 }
 
 func RemoveRelation(conn net.Conn, symbol string) {
+	fmt.Println("RemoveRelation", conn, symbol)
+
 	_relations.lock.Lock()
 
 	for e := _relations.data.Front(); e != nil; e = e.Next() {
@@ -116,6 +121,8 @@ func RemoveRelation(conn net.Conn, symbol string) {
 }
 
 func RemoveConn(conn net.Conn) {
+	fmt.Println("RemoveRelation", conn)
+
 	_relations.lock.Lock()
 
 	for e := _relations.data.Front(); e != nil; e = e.Next() {
@@ -129,6 +136,8 @@ func RemoveConn(conn net.Conn) {
 }
 
 func processDataIndeed(data string) {
+	fmt.Println("processDataIndeed", data)
+
 	tmp := strings.Split(data, "-")
 	if len(tmp) != 2 {
 		return
@@ -138,8 +147,8 @@ func processDataIndeed(data string) {
 	_relations.lock.Lock()
 
 	for e := _relations.data.Front(); e != nil; e = e.Next() {
-		if e.Value.(*relation).symbol == symbol {
-			err := wsutil.WriteServerMessage(e.Value.(*relation).conn, ws.OpContinuation, []byte(data))
+		if strings.Contains(e.Value.(relation).symbol, symbol) {
+			err := wsutil.WriteServerMessage(e.Value.(relation).conn, ws.OpContinuation, []byte(data))
 			if err != nil {
 				// handle error
 			}

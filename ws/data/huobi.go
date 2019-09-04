@@ -36,7 +36,15 @@ func HuobiInit(chanCollector chan string, chanData chan string) {
 func getData(chanCollector chan string, chanData chan string, market *market.Market) {
 	for {
 		input := <-chanCollector
-		topic := strings.ReplaceAll("market.btcusdt.trade.detail", "btcusdt", input+"btc")
+
+		var target string
+		if strings.EqualFold(input, "btc") {
+			target = "btcusdt"
+		} else {
+			target = input + "btc"
+		}
+
+		topic := strings.ReplaceAll("market.btcusdt.trade.detail", "btcusdt", target)
 		_ = market.Subscribe(topic, func(topic string, json *huobiapi.JSON) {
 			dataReceive(chanData, topic, json)
 		})
@@ -47,9 +55,15 @@ func getData(chanCollector chan string, chanData chan string, market *market.Mar
 func dataReceive(chanData chan string, topic string, json *huobiapi.JSON) {
 	market := strings.Split(topic, ".")[1]
 	price, _ := json.Get("tick").Get("data").GetIndex(0).Get("price").Float64()
-	fmt.Println(market, price)
+	//fmt.Println(market, price)
 
-	priceString := strconv.FormatFloat(price, 'f', 2, 64)
-	fmt.Println(priceString)
+	var prec int
+	if strings.Contains(topic, "usdt") {
+		prec = 2
+	} else {
+		prec = 8
+	}
+	priceString := strconv.FormatFloat(price, 'f', prec, 64)
+	//fmt.Println(priceString)
 	chanData <- market + "-" + priceString
 }
