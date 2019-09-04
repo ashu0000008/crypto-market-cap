@@ -46,9 +46,10 @@ func getData(chanCollector chan string, chanData chan string, market *market.Mar
 
 func dataReceive(chanData chan string, topic string, json *huobiapi.JSON) {
 	market := strings.Split(topic, ".")[1]
-	price, _ := json.Get("tick").Get("data").Get("price").Float64()
+	price, _ := json.Get("tick").Get("data").GetIndex(0).Get("price").Float64()
 	fmt.Println(market, price)
 
-	priceString := strconv.FormatFloat(price, 'E', 2, 64)
+	priceString := strconv.FormatFloat(price, 'f', 2, 64)
+	fmt.Println(priceString)
 	chanData <- market + "-" + priceString
 }
