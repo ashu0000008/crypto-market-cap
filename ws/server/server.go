@@ -103,6 +103,7 @@ func AddRelation(conn1 net.Conn, symbol1 string) {
 	_relations.data.PushBack(data)
 
 	_relations.lock.Unlock()
+
 }
 
 func RemoveRelation(conn net.Conn, symbol string) {
@@ -150,7 +151,7 @@ func processDataIndeed(data string) {
 		if strings.Contains(e.Value.(relation).symbol, symbol) {
 			err := wsutil.WriteServerMessage(e.Value.(relation).conn, ws.OpContinuation, []byte(data))
 			if err != nil {
-				// handle error
+				fmt.Println(err.Error())
 			}
 		}
 	}
