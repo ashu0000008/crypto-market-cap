@@ -3,20 +3,29 @@ package server
 import (
 	"container/list"
 	"fmt"
+	"github.com/ashu0000008/crypto-market-cap/ws/config"
+	"github.com/ashu0000008/crypto-market-cap/ws/redisops"
+	"github.com/go-redis/redis"
+	"log"
 	"net"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/gobwas/ws"
 	"github.com/gobwas/ws/wsutil"
 )
 
-func StartWSServer(chanCollector chan string, chanData chan string) {
+func StartWSServer() {
+
+	redisClient := redisops.RedisConnect()
+	dataPubsub := redisClient.Subscribe(config.REDIS_QUOTE_DATA_NAME)
 
 	initRelation()
-	go processData(chanData)
+	go processData(dataPubsub)
 
 	http.ListenAndServe(":9000", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		conn, _, _, err := ws.UpgradeHTTP(r, w)
@@ -33,14 +42,19 @@ func StartWSServer(chanCollector chan string, chanData chan string) {
 			for {
 				msg, op, err := wsutil.ReadClientData(conn)
 				if err != nil {
-					// handle error
+					fmt.Println(err.Error())
+
+					//链接坏了，就退出
+					if processNetError(conn, err) {
+						break
+					}
 				}
 
 				if op == ws.OpContinuation {
 					time.Sleep(time.Duration(1) * time.Second)
 				}
 
-				proccessRequest(string(msg), chanCollector, conn)
+				proccessRequest(string(msg), redisClient, conn)
 
 				//echo := "server get:" + string(msg)
 				//err = wsutil.WriteServerMessage(conn, op, []byte(echo))
@@ -52,14 +66,55 @@ func StartWSServer(chanCollector chan string, chanData chan string) {
 	}))
 }
 
-func proccessRequest(request string, chanCollector chan string, conn net.Conn) {
+func processNetError(conn net.Conn, err error) bool {
+
+	//netErr, ok := err.(net.Error)
+	//if !ok {
+	//	return false
+	//}
+	//
+	//if netErr.Timeout() {
+	//	log.Println("timeout")
+	//	return false
+	//}
+
+	opErr, ok := err.(*net.OpError)
+	if !ok {
+		return false
+	}
+
+	switch t := opErr.Err.(type) {
+	case *net.DNSError:
+		log.Printf("net.DNSError:%+v", t)
+		return true
+	case *os.SyscallError:
+		log.Printf("os.SyscallError:%+v", t)
+		if errno, ok := t.Err.(syscall.Errno); ok {
+			switch errno {
+			case syscall.ECONNREFUSED:
+				log.Println("connect refused")
+				return true
+			case syscall.ECONNRESET:
+				log.Println("connect reset")
+				return true
+			case syscall.ETIMEDOUT:
+				log.Println("timeout")
+				return false
+			}
+		}
+	}
+
+	return false
+}
+
+func proccessRequest(request string, redisClient *redis.Client, conn net.Conn) {
 	tmp := strings.Split(request, ":")
 	if len(tmp) != 2 {
 		return
 	}
 
 	symbol := tmp[1]
-	chanCollector <- symbol
+	redisClient.Publish(config.REDIS_QUOTE_MANAGER_NAME, symbol)
 
 	//将chan与symbol的关系通知给manager
 	if strings.EqualFold("add", tmp[0]) {
@@ -69,11 +124,10 @@ func proccessRequest(request string, chanCollector chan string, conn net.Conn) {
 	}
 }
 
-func processData(chanData chan string) {
-	var input string
+func processData(dataPubsub *redis.PubSub) {
 	for {
-		input = <-chanData
-		processDataIndeed(input)
+		input, _ := dataPubsub.ReceiveMessage()
+		processDataIndeed(input.Payload)
 	}
 }
 
@@ -99,7 +153,7 @@ func AddRelation(conn1 net.Conn, symbol1 string) {
 
 	_relations.lock.Lock()
 
-	data := relation{conn: conn1, symbol: symbol1}
+	data := &relation{conn: conn1, symbol: symbol1}
 	_relations.data.PushBack(data)
 
 	_relations.lock.Unlock()
@@ -148,8 +202,11 @@ func processDataIndeed(data string) {
 	_relations.lock.Lock()
 
 	for e := _relations.data.Front(); e != nil; e = e.Next() {
-		if strings.Contains(e.Value.(relation).symbol, symbol) {
-			err := wsutil.WriteServerMessage(e.Value.(relation).conn, ws.OpContinuation, []byte(data))
+		target := e.Value.(*relation).symbol
+		fmt.Println(target)
+		if strings.Contains(symbol, target) {
+			fmt.Println("send data:", data)
+			err := wsutil.WriteServerMessage(e.Value.(*relation).conn, ws.OpContinuation, []byte(data))
 			if err != nil {
 				fmt.Println(err.Error())
 			}

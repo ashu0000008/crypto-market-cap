@@ -10,6 +10,7 @@ build:
 				cd main && $(GOBUILD) -o ../output/crypto-collector -v main.go
 				cd api && $(GOBUILD) -o ../output/crypto-api -v api.go
 				cd ws && $(GOBUILD) -o ../output/ws-api -v main.go
+				cd ws && $(GOBUILD) -o ../output/collect_service -v collect_service.go
 test:
 				cd main && $(GOTEST) -v ./...
 clean:
