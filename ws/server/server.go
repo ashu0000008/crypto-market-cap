@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"reflect"
 	"strings"
 	"sync"
 	"syscall"
@@ -54,6 +55,7 @@ func StartWSServer() {
 					time.Sleep(time.Duration(1) * time.Second)
 				}
 
+				fmt.Println("conn receive--------:", string(msg))
 				proccessRequest(string(msg), redisClient, conn)
 
 				//echo := "server get:" + string(msg)
@@ -62,6 +64,8 @@ func StartWSServer() {
 				//	// handle error
 				//}
 			}
+
+			fmt.Println("-------quit", conn)
 		}()
 	}))
 }
@@ -180,10 +184,11 @@ func RemoveConn(conn net.Conn) {
 
 	_relations.lock.Lock()
 
-	for e := _relations.data.Front(); e != nil; e = e.Next() {
-		if e.Value.(*relation).conn == conn {
+	var n *list.Element
+	for e := _relations.data.Front(); e != nil; e = n {
+		n = e.Next()
+		if reflect.DeepEqual(e.Value.(*relation).conn, conn) {
 			_relations.data.Remove(e)
-			break
 		}
 	}
 
@@ -191,7 +196,7 @@ func RemoveConn(conn net.Conn) {
 }
 
 func processDataIndeed(data string) {
-	fmt.Println("processDataIndeed", data)
+	//fmt.Println("processDataIndeed", data)
 
 	tmp := strings.Split(data, "-")
 	if len(tmp) != 2 {
@@ -203,10 +208,9 @@ func processDataIndeed(data string) {
 
 	for e := _relations.data.Front(); e != nil; e = e.Next() {
 		target := e.Value.(*relation).symbol
-		fmt.Println(target)
 		if strings.Contains(symbol, target) {
 			fmt.Println("send data:", data)
-			err := wsutil.WriteServerMessage(e.Value.(*relation).conn, ws.OpContinuation, []byte(data))
+			err := wsutil.WriteServerMessage(e.Value.(*relation).conn, ws.OpText, []byte(data))
 			if err != nil {
 				fmt.Println(err.Error())
 			}
