@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/ashu0000008/crypto-market-cap/account"
 	"github.com/ashu0000008/crypto-market-cap/ip2country"
 	"github.com/gin-gonic/gin"
@@ -178,5 +179,7 @@ func deleteFavorite(context *gin.Context) {
 
 func getCountry(context *gin.Context) {
 	var ipAddr = context.ClientIP()
-	context.String(http.StatusOK, ip2country.GetCountry(ipAddr))
+	country := ip2country.GetCountry(ipAddr)
+	fmt.Println("/country", ipAddr, country)
+	context.String(http.StatusOK, country)
 }
