@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/ashu0000008/crypto-market-cap/account"
+	"github.com/ashu0000008/crypto-market-cap/ip2country"
 	"github.com/gin-gonic/gin"
 	"github.com/unrolled/secure"
 	"net/http"
@@ -44,6 +45,8 @@ func main() {
 	engine_https.GET("/favorite", getFavorite)
 	engine_https.POST("/favorite", postFavorite)
 	engine_https.DELETE("/favorite", deleteFavorite)
+
+	engine_https.GET("/country", getCountry)
 
 	go engine_https.RunTLS(":443", path+"cert.pem", path+"privkey.pem")
 	engine.Run(":80")
@@ -171,4 +174,9 @@ func deleteFavorite(context *gin.Context) {
 	} else {
 		context.String(http.StatusInternalServerError, "")
 	}
+}
+
+func getCountry(context *gin.Context) {
+	var ipAddr = context.ClientIP()
+	context.String(http.StatusOK, ip2country.GetCountry(ipAddr))
 }
