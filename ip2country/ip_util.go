@@ -27,6 +27,6 @@ func GetCountry(ipAddr string) string {
 	if err != nil {
 		return ""
 	}
-	result := record.Continent.Names["en"] + "-" + record.Country.Names["en"] + "-" + record.Subdivisions[0].Names["en"] + "-" + record.City.Names["en"]
+	result := record.Country.Names["en"] + "-" + record.City.Names["en"]
 	return result
 }
