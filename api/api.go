@@ -48,6 +48,7 @@ func main() {
 	engine_https.DELETE("/favorite", deleteFavorite)
 
 	engine_https.GET("/country", getCountry)
+	engine_https.GET("/country/:ip", getCountry1)
 
 	go engine_https.RunTLS(":443", path+"cert.pem", path+"privkey.pem")
 	engine.Run(":80")
@@ -179,6 +180,13 @@ func deleteFavorite(context *gin.Context) {
 
 func getCountry(context *gin.Context) {
 	var ipAddr = context.ClientIP()
+	country := ip2country.GetCountry(ipAddr)
+	fmt.Println("/country", ipAddr, country)
+	context.String(http.StatusOK, country)
+}
+
+func getCountry1(context *gin.Context) {
+	ipAddr := context.Param("ip")
 	country := ip2country.GetCountry(ipAddr)
 	fmt.Println("/country", ipAddr, country)
 	context.String(http.StatusOK, country)
