@@ -6,6 +6,7 @@ import (
 	"github.com/ashu0000008/crypto-market-cap/ws/config"
 	"github.com/ashu0000008/crypto-market-cap/ws/redisops"
 	"github.com/go-redis/redis"
+	"io"
 	"log"
 	"net"
 	"net/http"
@@ -47,6 +48,10 @@ func StartWSServer() {
 
 					//链接坏了，就退出
 					if processNetError(conn, err) {
+						break
+					}
+
+					if err == io.EOF {
 						break
 					}
 				}
