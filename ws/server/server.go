@@ -51,6 +51,11 @@ func StartWSServer() {
 					}
 				}
 
+				if op == ws.OpClose {
+					fmt.Println("conn", conn, "close")
+					break
+				}
+
 				if op == ws.OpContinuation {
 					time.Sleep(time.Duration(1) * time.Second)
 				}
