@@ -94,21 +94,25 @@ func processNetError(conn net.Conn, err error) bool {
 
 	switch t := opErr.Err.(type) {
 	case *net.DNSError:
-		log.Printf("net.DNSError:%+v", t)
+		fmt.Println("net.DNSError")
 		return true
 	case *os.SyscallError:
 		log.Printf("os.SyscallError:%+v", t)
 		if errno, ok := t.Err.(syscall.Errno); ok {
 			switch errno {
 			case syscall.ECONNREFUSED:
-				log.Println("connect refused")
+				fmt.Println("os.SyscallError", "syscall.ECONNREFUSED")
 				return true
 			case syscall.ECONNRESET:
+				fmt.Println("os.SyscallError", "syscall.ECONNRESET")
 				log.Println("connect reset")
 				return true
 			case syscall.ETIMEDOUT:
+				fmt.Println("os.SyscallError", "syscall.ETIMEDOUT")
 				log.Println("timeout")
 				return false
+			default:
+				fmt.Println("os.SyscallError", errno)
 			}
 		}
 	}
