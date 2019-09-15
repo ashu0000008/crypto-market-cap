@@ -56,18 +56,41 @@ func getData1(chanCollector *redis.PubSub, redisClient *redis.Client, market *ma
 
 func dataReceive1(redisClient *redis.Client, topic string, json *huobiapi.JSON) {
 	market := strings.Split(topic, ".")[1]
-	price, _ := json.Get("tick").Get("data").GetIndex(0).Get("price").Float64()
-	fmt.Println(market, price)
 
-	var prec int
-	if strings.Contains(topic, "usdt") {
-		prec = 2
-	} else {
-		prec = 8
+	data, err := json.Get("tick").Get("data").Array()
+	if nil != err {
+		return
 	}
-	priceString := strconv.FormatFloat(price, 'f', prec, 64)
-	//fmt.Println(priceString)
-	data := market + "-" + priceString
 
-	redisClient.Publish(config.REDIS_QUOTE_DATA_NAME, data)
+	for index := range data {
+		price, _ := json.Get("tick").Get("data").GetIndex(index).Get("price").Float64()
+		fmt.Println(market, price)
+
+		var prec int
+		if strings.Contains(topic, "usdt") {
+			prec = 2
+		} else {
+			prec = 8
+		}
+		priceString := strconv.FormatFloat(price, 'f', prec, 64)
+		//fmt.Println(priceString)
+		data := market + "-" + priceString
+
+		redisClient.Publish(config.REDIS_QUOTE_DATA_NAME, data)
+	}
+
+	//price, _ := json.Get("tick").Get("data").GetIndex(0).Get("price").Float64()
+	//fmt.Println(market, price)
+	//
+	//var prec int
+	//if strings.Contains(topic, "usdt") {
+	//	prec = 2
+	//} else {
+	//	prec = 8
+	//}
+	//priceString := strconv.FormatFloat(price, 'f', prec, 64)
+	////fmt.Println(priceString)
+	//data := market + "-" + priceString
+	//
+	//redisClient.Publish(config.REDIS_QUOTE_DATA_NAME, data)
 }
